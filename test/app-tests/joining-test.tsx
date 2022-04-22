@@ -43,7 +43,7 @@ const IS_URL='http://localhost';
 const USER_ID='@me:localhost';
 const ACCESS_TOKEN='access_token';
 
-describe('joining a room', function() {
+describe.skip('joining a room', function() {
     describe('over federation', function() {
         let parentDiv;
         let httpBackend;

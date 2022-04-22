@@ -62,7 +62,7 @@
     "jsrsasign": "^10.2.0",
     "katex": "^0.12.0",
     "matrix-js-sdk": "16.0.0",
-    "matrix-react-sdk": "3.42.0",
+    "matrix-react-sdk": "github:tchapgouv/matrix-react-sdk-v4#ac3a907",
     "matrix-widget-api": "^0.1.0-beta.18",
     "prop-types": "^15.7.2",
     "react": "17.0.2",
@@ -122,7 +122,7 @@
     "file-loader": "^5.1.0",
     "fs-extra": "^0.30.0",
     "html-webpack-plugin": "^4.5.2",
-    "jest": "^26.6.3",
+    "jest": "^28.0.0-alpha.11",
     "jest-environment-jsdom-sixteen": "^1.0.3",
     "jest-raw-loader": "^1.0.1",
     "json-loader": "^0.5.7",
@@ -168,13 +168,19 @@
     "@types/react": "17.0.14"
   },
   "jest": {
+    "haste": {
+      "retainAllFiles": true
+    },
     "testEnvironment": "jest-environment-jsdom-sixteen",
     "testMatch": [
-      "<rootDir>/test/**/*-test.[tj]s?(x)"
+      "<rootDir>/node_modules/matrix-react-sdk/**/*-test.[tj]s?(x)"
     ],
+    "testPathIgnorePatterns": [],
+
     "setupFilesAfterEnv": [
       "<rootDir>/node_modules/matrix-react-sdk/test/setupTests.js"
     ],
+
     "moduleNameMapper": {
       "\\.(css|scss)$": "<rootDir>/__mocks__/cssMock.js",
       "\\.(gif|png|ttf|woff2)$": "<rootDir>/node_modules/matrix-react-sdk/__mocks__/imageMock.js",
@@ -195,8 +201,7 @@
       "RecorderWorklet": "<rootDir>/node_modules/matrix-react-sdk/__mocks__/empty.js"
     },
     "transformIgnorePatterns": [
-      "/node_modules/(?!matrix-js-sdk).+$",
-      "/node_modules/(?!matrix-react-sdk).+$"
+      "node_modules/(?!(matrix-react-sdk|matrix-js-sdk)/)"
     ]
   }
 }

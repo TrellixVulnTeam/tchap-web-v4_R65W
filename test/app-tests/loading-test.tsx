@@ -45,7 +45,7 @@ import LoginComponent from 'matrix-react-sdk/src/components/structures/auth/Logi
 const DEFAULT_HS_URL='http://my_server';
 const DEFAULT_IS_URL='http://my_is';
 
-describe('loading:', function() {
+describe.skip('loading:', function() {
     let parentDiv;
     let httpBackend;
 
