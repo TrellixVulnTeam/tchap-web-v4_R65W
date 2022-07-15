@@ -5,7 +5,8 @@ Copyright 2022 DINUM
 import React from 'react';
 import classNames from "classnames";
 import { _t } from 'matrix-react-sdk/src/languageHandler';
-import * as sdk from 'matrix-react-sdk/src/index';
+import StyledRadioButton from "matrix-react-sdk/src/components/views/elements/StyledRadioButton";
+import LabelledToggleSwitch from "matrix-react-sdk/src/components/views/elements/LabelledToggleSwitch";
 
 import { TchapRoomType } from "../../../@types/tchap";
 
@@ -26,7 +27,6 @@ interface IState {
     roomType: TchapRoomType;
 }
 
-// todo rename, not a dropdown anymore
 export default class TchapRoomTypeSelector extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
@@ -44,9 +44,6 @@ export default class TchapRoomTypeSelector extends React.Component<IProps, IStat
     };
 
     public render(): JSX.Element {
-        const StyledRadioButton = sdk.getComponent("elements.StyledRadioButton");
-        const LabelledToggleSwitch = sdk.getComponent("elements.LabelledToggleSwitch");
-
         const privateClasses = classNames(
             "tc_TchapRoomTypeSelector_RadioButton",
             "tc_TchapRoomTypeSelector_private",
@@ -68,18 +65,20 @@ export default class TchapRoomTypeSelector extends React.Component<IProps, IStat
 
         let roomFederateOpt;
         if (this.props.showFederateSwitch) {
-            //todo: add traduction
             roomFederateOpt = (
-                <div className="tc_CreateRoomDialog_RoomOption_suboption">
-                    <LabelledToggleSwitch label={_t('Limit access to this room to domain members',
-                        { domain: this.props.shortDomain })}
-                    onChange={(value: boolean) => this.props.onFederatedChange(!value)}
-                    value={!this.props.isFederated} />
+                <div>
+                    <LabelledToggleSwitch
+                        label={_t(
+                            "Allow access to this room to all users, even outside \"%(domain)s\" domain",
+                            { domain: this.props.shortDomain },
+                        )}
+                        onChange={this.props.onFederatedChange}
+                        value={this.props.isFederated} />
                 </div>
             );
         }
 
-        return <div className="tc_TchapRoomTypeSelector_RadioButtons">
+        return <div className="tc_TchapRoomTypeSelector">
             <label className={privateClasses}>
                 <StyledRadioButton
                     name="roomType"

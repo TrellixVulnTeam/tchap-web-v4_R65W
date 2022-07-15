@@ -1,21 +1,13 @@
 /*
-Copyright 2017 Michael Telatynski <7t3chguy@gmail.com>
-Copyright 2020, 2021 The Matrix.org Foundation C.I.C.
+Copyright 2022 DINUM
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+Replaces CreateRoomDialog.tsx
 
-    http://www.apache.org/licenses/LICENSE-2.0
+Tchap has 3 types of rooms only : private, private open to externs, and public (forum).
+Tchap does not support spaces for now, so there are no settings dependent on spaces (for example "Visible to space
+members"). Element uses JoinRule.Restricted for this.
+When/if Tchap supports spaces, we can decide on more specific settings if needed.
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
-/*
 Note on imports : because this file will be copied to a different directory by the customisations
 mechanism, imports must use absolute paths.
 Except when importing from other customisation files. Then imports must use relative paths.
@@ -27,20 +19,21 @@ import { _t } from 'matrix-react-sdk/src/languageHandler';
 import { IOpts } from "matrix-react-sdk/src/createRoom";
 import { getKeyBindingsManager } from "matrix-react-sdk/src/KeyBindingsManager";
 import { KeyBindingAction } from "matrix-react-sdk/src/accessibility/KeyboardShortcuts";
-import * as sdk from 'matrix-react-sdk/src/index';
 import Field from "matrix-react-sdk/src/components/views/elements/Field";
+import DialogButtons from "matrix-react-sdk/src/components/views/elements/DialogButtons";
+import BaseDialog from "matrix-react-sdk/src/components/views/dialogs/BaseDialog";
 
 import TchapUtils from '../../../util/TchapUtils';
 import TchapRoomTypeSelector from "./../elements/TchapRoomTypeSelector";
 import { TchapRoomType } from "../../../@types/tchap";
 import roomCreateOptions from "../../../lib/createTchapRoom";
-// todo remove unused imports at the end.
 
+// We leave the same props as Element's version, to avoid unknown props warnings.
 interface IProps {
-    defaultPublic?: boolean;
+    defaultPublic?: boolean; // unused for Tchap version
     defaultName?: string;
-    parentSpace?: Room;
-    defaultEncrypted?: boolean;
+    parentSpace?: Room; // unused for Tchap version
+    defaultEncrypted?: boolean; // unused for Tchap version
     onFinished(proceed: boolean, opts?: IOpts): void;
 }
 
@@ -49,6 +42,7 @@ interface IState {
     nameIsValid: boolean;
     tchapRoomType: TchapRoomType;
     isFederated: boolean;
+    showFederateSwitch: boolean;
 }
 
 export default class TchapCreateRoomDialog extends React.Component<IProps, IState> {
@@ -57,11 +51,14 @@ export default class TchapCreateRoomDialog extends React.Component<IProps, IStat
     constructor(props) {
         super(props);
 
+        const federationOptions = TchapUtils.getRoomFederationOptions();
+
         this.state = {
             name: this.props.defaultName || "",
             nameIsValid: false,
             tchapRoomType: TchapRoomType.Private,
-            isFederated: true,
+            isFederated: federationOptions.roomFederationDefault,
+            showFederateSwitch: federationOptions.showRoomFederationOption,
         };
     }
 
@@ -144,24 +141,12 @@ export default class TchapCreateRoomDialog extends React.Component<IProps, IStat
 
     render() {
         const shortDomain: string = TchapUtils.getShortDomain();
-        const showFederateSwitch: boolean = shortDomain!=="Agent";
-        const Field = sdk.getComponent("elements.Field");
-        const DialogButtons = sdk.getComponent("elements.DialogButtons");
-        const BaseDialog =sdk.getComponent("dialogs.BaseDialog");
 
         const title = _t("Create a room");
-        /* todo do we need this ?
-        if (CommunityPrototypeStore.instance.getSelectedCommunityId()) {
-            const name = CommunityPrototypeStore.instance.getSelectedCommunityName();
-            title = _t("Create a room in %(communityName)s", { communityName: name });
-        } else if (!this.props.parentSpace) {
-            title = this.state.joinRule === JoinRule.Public ? _t('Create a public room') : _t('Create a private room');
-        }
-        */
 
         return (
             <BaseDialog
-                className="mx_CreateRoomDialog"
+                className="tc_TchapCreateRoomDialog"
                 onFinished={this.props.onFinished}
                 title={title}
                 screenName="CreateRoom"
@@ -174,14 +159,13 @@ export default class TchapCreateRoomDialog extends React.Component<IProps, IStat
                             onChange={this.onNameChange}
                             onValidate={this.onNameValidate}
                             value={this.state.name}
-                            className="mx_CreateRoomDialog_name"
                         />
 
                         <TchapRoomTypeSelector
                             onChange={this.onTchapRoomTypeChange}
                             value={this.state.tchapRoomType}
                             label={_t("Type of room")}
-                            showFederateSwitch={showFederateSwitch}
+                            showFederateSwitch={this.state.showFederateSwitch}
                             shortDomain={shortDomain}
                             isFederated={this.state.isFederated}
                             onFederatedChange={this.onFederatedChange}
